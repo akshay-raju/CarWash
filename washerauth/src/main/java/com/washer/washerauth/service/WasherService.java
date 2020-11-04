@@ -1,5 +1,7 @@
 package com.washer.washerauth.service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +22,28 @@ public class WasherService {
 		if (findExisted.isPresent()) {
 			return null;
 		} else {
+			System.out.println("in else");
+			try {
+				System.out.println("in try block");
+				MessageDigest md =MessageDigest.getInstance("SHA");
+				md.update(washer.getPassword().getBytes());
+				byte[] s =md.digest();
+				StringBuilder sb= new StringBuilder();
+				for(byte b:s)
+				{
+					sb.append(String.format("%02x", b));
+				}
+				washer.setPassword(sb.toString());
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+//			 catch (NoSuchAlgorithmException e) {​​​​​​
+//
+//	             // TODO Auto-generated catch block
+//
+//	             e.printStackTrace();
+//
+//	         }
 			return washerRepo.save(washer);
 		}
 
@@ -27,6 +51,20 @@ public class WasherService {
 
 	public Washer login(Washer washer) {
 		Optional<Washer> findExisted = washerRepo.findById(washer.getEmailId());
+		try {
+			System.out.println("in try block");
+			MessageDigest md =MessageDigest.getInstance("SHA");
+			md.update(washer.getPassword().getBytes());
+			byte[] s =md.digest();
+			StringBuilder sb= new StringBuilder();
+			for(byte b:s)
+			{
+				sb.append(String.format("%02x", b));
+			}
+			washer.setPassword(sb.toString());
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 		if (findExisted.isPresent()) {
 			Washer temp = findExisted.get();
 			if (temp.getPassword().contentEquals(washer.getPassword())) {
