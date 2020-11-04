@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.customerwashrequest.pojo.WashOrder;
+import com.customerwashrequest.service.RabbitMQSender;
 import com.customerwashrequest.service.WashOrderService;
 
 import io.swagger.annotations.Api;
@@ -19,11 +20,15 @@ public class WashRequestApi {
 
 	@Autowired
 	private WashOrderService service;
+	
+	@Autowired
+	private RabbitMQSender sender;
 
 	@PostMapping("/saveorder")
 	@ApiOperation(value = "Saving order")
 	public WashOrder saveOrder(@RequestBody WashOrder order) {
 		System.out.println(order);
+		sender.send(order);
 		return service.saveOrder(order);
 	}
 
